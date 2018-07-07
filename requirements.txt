@@ -1,0 +1,4 @@
+numpy
+sklearn
+pytorch==0.4.0
+jieba==0.39

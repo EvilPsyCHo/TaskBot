@@ -10,8 +10,9 @@ TaskBot是一个基于深度学习、机器学习、规则系统的任务驱动�
 3. 有redis、mongodb等数据库经验
 4. 萌妹子
 
-@email: evilpsycho42@google.com
-@blog: evilpsycho.github.io
++ @email: evilpsycho42@google.com
++ @blog: evilpsycho.github.io
++ @知乎: https://www.zhihu.com/people/zhouzhirui
 
 ## 特性
 
