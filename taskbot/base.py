@@ -25,7 +25,6 @@ class MetaSkill(object):
         """
         raise NotImplementedError
 
-    @property
     def slots(self):
         """slots
 
@@ -128,3 +127,20 @@ class MetaTrainable(object):
             self
         """
         raise NotImplementedError
+
+
+class MetaEntity(dict):
+    """MetaEntity, a abstract class for ALL ENTITY"""
+
+    def __init__(self, *args, **kwargs):
+        """init dict"""
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def name(cls):
+        """name of entity
+
+        Returns:
+            <str>
+        """
+        return cls.__name__
