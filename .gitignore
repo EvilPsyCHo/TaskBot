@@ -6,4 +6,3 @@ __pycache__
 .idea
 .DS_Store
 .spyproject
-results/*

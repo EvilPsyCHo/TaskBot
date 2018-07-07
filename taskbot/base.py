@@ -73,6 +73,7 @@ class MetaTransformer(object):
 class MetaSerializable(object):
     """MetaSerializable, a abstract for ALL class which can save & load"""
 
+    @classmethod
     def save(self, path):
         """interface for saving class
 
