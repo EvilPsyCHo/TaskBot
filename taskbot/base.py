@@ -2,7 +2,6 @@
 # @Time    : 7/7/18 12:04
 # @Author  : evilpsycho
 # @Mail    : evilpsycho42@gmail.com
-import abc
 
 
 class MetaSkill(object):
@@ -45,21 +44,6 @@ class MetaSkill(object):
             <bool>
         """
         raise NotImplementedError
-
-    @classmethod
-    def name(cls):
-        """name
-
-        Returns:
-            <str> name of skill
-        """
-        return cls.__name__
-
-    def __str__(self):
-        return "skill %s" % self.name()
-
-    def __repr__(self):
-        return self.__str__()
 
 
 class MetaEstimator(object):
@@ -144,3 +128,21 @@ class MetaEntity(dict):
             <str>
         """
         return cls.__name__
+
+
+class MetaContext(dict):
+    """MetaContext, a abstract class for ALL context
+
+    Context record all information about the dialog
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def is_timeout(self):
+        """Determine if the context is timeout.
+
+        Returns:
+            <bool> True means context is timeout.
+
+        """
+        raise NotImplementedError
