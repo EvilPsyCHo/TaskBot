@@ -59,11 +59,10 @@ class Dictionary(GensimDictionary, MetaTransformer, MetaSerializable, MetaTraina
         return self
 
     def __str__(self):
-        print(super(Dictionary))
-    #     # return "{} contains {} words".format(self.__class__.__name__, len(self.token2id))
-    #
-    # def __repr__(self):
-    #     return self.__str__()
+        return "{} contains {} words".format(self.__class__.__name__, len(self.token2id))
+
+    def __repr__(self):
+        return self.__str__()
 
 
 if __name__ == "__main__":
