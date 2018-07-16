@@ -7,9 +7,12 @@ from taskbot.config import UNKNOWN, UNKNOWN_IDX, PAD, PAD_IDX
 
 from gensim.corpora.dictionary import Dictionary as GensimDictionary
 from gensim import utils
+import jieba
+
+import multiprocessing as mp
 
 
-__all__ = ["Dictionary"]
+__all__ = ["Dictionary", "Segment"]
 
 
 class Dictionary(GensimDictionary, MetaTransformer, MetaSerializable, MetaTrainable):
@@ -43,7 +46,16 @@ class Dictionary(GensimDictionary, MetaTransformer, MetaSerializable, MetaTraina
             rst.append(rst_i)
         return rst
 
-    def reverse(self, documents_idx, unknown_word="UNKNOWN"):
+    def reverse(self, documents_idx, unknown_word=UNKNOWN):
+        """
+
+        Args:
+            documents_idx: <List of List of Int>
+            unknown_word:
+
+        Returns:
+
+        """
         if len(self.id2token) != len(self.token2id):
             self.id2token = utils.revdict(self.token2id)
         rst = []
@@ -65,13 +77,66 @@ class Dictionary(GensimDictionary, MetaTransformer, MetaSerializable, MetaTraina
         return self.__str__()
 
 
+class Segment(MetaTransformer):
+    def __init__(self, vocabulary=None):
+        self._cpu = mp.cpu_count()
+        if vocabulary is not None:
+            self.load_userdict(vocabulary)
+
+    @staticmethod
+    def load_userdict(vocabulary):
+        jieba.load_userdict(vocabulary)
+
+    def transform(self, documents, n_job=None):
+        """
+
+        Args:
+            documents: <List of String>
+            n_job: <Int>
+
+        Returns:
+            <List of List of String
+        """
+        if n_job is not None:
+            n_job = min(self._cpu, n_job)
+            pool = mp.Pool(n_job)
+            rst = pool.map(_cut2list, documents)
+            pool.close()
+            pool.join()
+        else:
+            rst = [_cut2list(d) for d in documents]
+        return rst
+
+    def reverse(self, documents):
+        """
+
+        Args:
+            documents: <List of List of String>
+
+        Returns:
+            <List of String>
+        """
+        return [" ".join(d) for d in documents]
+
+
+def _cut2list(x):
+    return jieba.lcut(x)
+
+
 if __name__ == "__main__":
-    path = "/home/zhouzr/project/test"
-    d = Dictionary()
-    s = [["1", "2"], ["23", "1"]*16]
-    d.add_documents(s)
-    d.transform(s, max_len=10)
-    d.reverse(d.transform(s))
-    d.reverse(d.transform(s, max_len=10))
-    d.save(path)
-    restore = Dictionary.load(path)
+    # path = "/home/zhouzr/project/test"
+    # d = Dictionary()
+    # s = [["1", "2"], ["23", "1"]*16]
+    # d.add_documents(s)
+    # d.transform(s, max_len=10)
+    # d.reverse(d.transform(s))
+    # d.reverse(d.transform(s, max_len=10))
+    # d.save(path)
+    # restore = Dictionary.load(path)
+
+    # documents = ["哈哈，你昨天吃了什么", "我今天很精神"]
+    # documents_100000 = documents * 50000
+    # seg = Segment()
+    # seg.transform(documents)
+    # seg.transform(documents_100000, n_job=4)
+    pass

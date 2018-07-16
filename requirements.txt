@@ -1,1 +1,4 @@
 gensim
+jieba
+# torch
+numpy
