@@ -2,7 +2,7 @@
 # @Time    : 7/7/18 16:06
 # @Author  : evilpsycho
 # @Mail    : evilpsycho42@gmail.com
-from taskbot.base import MetaTransformer, MetaSerializable, MetaTrainable
+from taskbot.core.base import MetaTransformer, MetaSerializable, MetaTrainable
 from taskbot.config import UNKNOWN, UNKNOWN_IDX, PAD, PAD_IDX
 
 from gensim.corpora.dictionary import Dictionary as GensimDictionary

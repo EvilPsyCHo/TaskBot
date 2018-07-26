@@ -5,3 +5,6 @@
 
 
 # TODO: Logger
+
+def ensure_dir(dir):
+    pass

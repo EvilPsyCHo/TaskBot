@@ -4,7 +4,7 @@
 # @Mail    : evilpsycho42@gmail.com
 import datetime as dt
 
-from taskbot.base import MetaEntity
+from taskbot.core.base import MetaEntity
 
 __all__ = ["TimeInterval", "Location", "Organization"]
 

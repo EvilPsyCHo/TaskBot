@@ -1,4 +1,4 @@
 gensim
 jieba
-# torch
+# pytorch
 numpy
