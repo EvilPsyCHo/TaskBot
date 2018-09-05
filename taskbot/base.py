@@ -1,4 +1,4 @@
-# coding:utf8
-# @Time    : 18-9-3 下午2:17
+# -*- coding: utf-8 -*-
+# @Time    : 9/4/18 14:19
 # @Author  : evilpsycho
 # @Mail    : evilpsycho42@gmail.com
