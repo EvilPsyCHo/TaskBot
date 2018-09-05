@@ -2,3 +2,4 @@
 gensim
 jieba
 numpy
+torch
