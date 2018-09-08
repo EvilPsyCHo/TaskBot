@@ -5,7 +5,8 @@
 import re
 import logging
 from collections import defaultdict
-from gensim.corpora.dictionary import Dictionary as GensimDict
+import scipy.sparse
+import numpy as np
 
 from taskbot.utils import SaveLoad
 from taskbot.utils.common import reverse_dict
@@ -16,7 +17,7 @@ logger = logging.getLogger("taskbot.Dictionary")
 class Dictionary(SaveLoad):
     def __init__(self, stop_words=None,
                  filters='`~!@#$%^&*()-_=+[{]}\\|,<.>/?～！@#￥%…&*（）-—=+【『】』；：‘“、|，《。》/？',
-                 special_token={0: '<pad>', 1: '<sos>', 2: '<end>'}, use_special_token=False,
+                 special_token={0: '<pad>', 1: '<sos>', 2: '<eos>'}, use_special_token=False,
                  ngram_range=(1, 1), min_df=1, max_df=1.0, lowercase=True,
                  token_pattern=" ", tokenizer=None):
         self.id2token = special_token if use_special_token else {}
@@ -92,11 +93,12 @@ class Dictionary(SaveLoad):
             result.append(result_raw)
         return result
 
-    def seq2doc(self, seqs):
+    def seq2doc(self, seqs, with_space=True):
         rest = []
+        space = " " if with_space else ""
         for seq in seqs:
             rest.append(
-                " ".join([self.id2token.get(i) for i in seq if self.id2token.get(i) is not None])
+                space.join([self.id2token.get(i) for i in seq if self.id2token.get(i) is not None])
             )
         return rest
 
@@ -112,6 +114,26 @@ class Dictionary(SaveLoad):
             result_raw = [(k, v) for k, v in result_raw.items()]
             result.append(result_raw)
         return result
+
+    def doc2mat(self, raw_documents):
+        tokenizer = self._build_tokenizer()
+        values = []
+        col_index = []
+        raw_index = []
+        for i, raw in enumerate(raw_documents):
+            tokens = tokenizer(raw)
+            tokens = [self.token2id.get(i) for i in self._word_ngrams(tokens) if self.token2id.get(i) is not None]
+            result_raw = defaultdict(int)
+            for t in tokens:
+                result_raw[t] += 1
+            values.extend(result_raw.values())
+            raw_index.extend([i] * len(result_raw))
+            col_index.extend(result_raw.keys())
+        return scipy.sparse.csr_matrix(
+            (values, (raw_index, col_index)),
+            shape=(len(raw_documents), self.size()),
+            dtype=np.int64
+        )
 
     def compact(self):
         """Assign new word ids to all words, shrinking gaps."""
