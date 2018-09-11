@@ -5,7 +5,7 @@
 from sklearn.feature_extraction.text import CountVectorizer
 corpus = ["好呀 123", "嗯那"]
 cv = CountVectorizer(ngram_range=[1,2]).fit(corpus)
-
+from keras.preprocessing.text import Tokenizer
 
 
 class Dictionary:
