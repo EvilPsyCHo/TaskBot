@@ -9,11 +9,21 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
+
 user_cuda = torch.has_cudnn
 
 
 class DynamicEncoder(nn.Module):
     def __init__(self, input_size, embed_size, hidden_size, n_layers=1, dropout=0.5):
+        """initialize encoder
+
+        Args:
+            input_size: <Int>, vocab_size
+            embed_size: <Int>, encoder embed size
+            hidden_size: <Int>, RNN hidden state size
+            n_layers: <Int>, RNN layers
+            dropout: <Float>, dropout rate
+        """
         super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
@@ -25,13 +35,15 @@ class DynamicEncoder(nn.Module):
 
     def forward(self, input_seqs, input_lens, hidden=None):
         """
-        forward procedure. **No need for inputs to be sorted**
-        :param input_seqs: Variable of [T,B]
-        :param hidden:
-        :param input_lens: *numpy array* of len for each input sequence
-        :return:
+
+        Args:
+            input_seqs: <list[list[int]]>, padded sentences
+            input_lens: <list[int]>, sentences length
+            hidden: <FloatTensor>
+
+        Returns:
+            outputs, hidden
         """
-        batch_size = input_seqs.size(1)
         embedded = self.embedding(input_seqs)
         embedded = embedded.transpose(0, 1)  # [B,T,E]
         sort_idx = np.argsort(-input_lens)
