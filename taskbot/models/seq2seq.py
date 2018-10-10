@@ -14,14 +14,14 @@ user_cuda = torch.has_cudnn
 
 
 class DynamicEncoder(nn.Module):
-    def __init__(self, input_size, embed_size, hidden_size, n_layers=1, dropout=0.5):
+    def __init__(self, input_size, embed_size, hidden_size, n_layers=1, dropout=0.5, bidirectional=True):
         """initialize encoder
 
         Args:
             input_size: <Int>, vocab_size
             embed_size: <Int>, encoder embed size
             hidden_size: <Int>, RNN hidden state size
-            n_layers: <Int>, RNN layers
+            n_layers: <Int>, numbers of RNN layers
             dropout: <Float>, dropout rate
         """
         super().__init__()
@@ -31,14 +31,14 @@ class DynamicEncoder(nn.Module):
         self.n_layers = n_layers
         self.dropout = dropout
         self.embedding = nn.Embedding(input_size, embed_size)
-        self.gru = nn.GRU(embed_size, hidden_size, n_layers, bidirectional=True)
+        self.gru = nn.GRU(embed_size, hidden_size, n_layers, bidirectional=bidirectional, dropout=dropout)
 
     def forward(self, input_seqs, input_lens, hidden=None):
         """
 
         Args:
-            input_seqs: <list[list[int]]>, padded sentences
-            input_lens: <list[int]>, sentences length
+            input_seqs: <list[list[int]]>, padded sentences, [T, B]
+            input_lens: <np.ndArray>, sentences length
             hidden: <FloatTensor>
 
         Returns:
@@ -95,40 +95,42 @@ class Attn(nn.Module):
 
 
 class AttnDecoder(nn.Module):
-    def __init__(self, hidden_size, embed_size, output_size, n_layers=1, dropout_p=0.1):
+    def __init__(self, hidden_size, embed_size, output_size, n_layers=1, dropout_ratio=0.1):
         super(AttnDecoder, self).__init__()
         # Define parameters
         self.hidden_size = hidden_size
         self.embed_size = embed_size
         self.output_size = output_size
         self.n_layers = n_layers
-        self.dropout_p = dropout_p
+        self.dropout_ratio = dropout_ratio
         # Define layers
         self.embedding = nn.Embedding(output_size, embed_size)
-        self.dropout = nn.Dropout(dropout_p)
+        self.dropout = nn.Dropout(dropout_ratio)
         self.attn = Attn('concat', hidden_size)
-        self.gru = nn.GRU(hidden_size + embed_size, hidden_size, n_layers, dropout=dropout_p)
-        #self.attn_combine = nn.Linear(hidden_size + embed_size, hidden_size)
+        self.gru = nn.GRU(hidden_size + embed_size, hidden_size, n_layers, dropout=dropout_ratio)
         self.out = nn.Linear(hidden_size, output_size)
 
     def forward(self, word_input, last_hidden, encoder_outputs):
-        '''
-        :param word_input:
-            word input for current time step, in shape (B)
-        :param last_hidden:
-            last hidden stat of the decoder, in shape (layers*direction*B*H)
-        :param encoder_outputs:
-            encoder outputs in shape (T*B*H)
-        :return
+        """
+
+        Args:
+            word_input: word input for current time step, in shape (B)
+            last_hidden: last hidden stat of the decoder, in shape (layers*direction*B*H)
+            encoder_outputs: encoder outputs in shape (T*B*H)
+
+        Returns:
             decoder output
-        Note: we run this one step at a time i.e. you should use a outer loop
+
+        Notes:
+            we run this one step at a time i.e. you should use a outer loop
             to process the whole sequence
-        Tip(update):
-        EncoderRNN may be bidirectional or have multiple layers, so the shape of hidden states can be
-        different from that of DecoderRNN
-        You may have to manually guarantee that they have the same dimension outside this function,
-        e.g, select the encoder hidden state of the foward/backward pass.
-        '''
+            Tip(update):
+            EncoderRNN may be bidirectional or have multiple layers, so the shape of hidden states can be
+            different from that of DecoderRNN
+            You may have to manually guarantee that they have the same dimension outside this function,
+            e.g, select the encoder hidden state of the foward/backward pass.
+
+        """
         # Get the embedding of the current input word (last output word)
         word_embedded = self.embedding(word_input).view(1, word_input.size(0), -1) # (1,B,V)
         word_embedded = self.dropout(word_embedded)
@@ -148,8 +150,3 @@ class AttnDecoder(nn.Module):
         # Return final output, hidden state
         return output, hidden
 
-
-class Seq2Seq(object):
-    def __init__(self):
-        self.encoder = DynamicEncoder(20000, 60, 60)
-        self.decoder = AttnDecoder(60,60,10000)
