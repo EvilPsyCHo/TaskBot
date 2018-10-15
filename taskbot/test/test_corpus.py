@@ -4,9 +4,9 @@
 # @Mail    : evilpsycho42@gmail.com
 import os
 
-from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import TfidfTransformer
 
-from taskbot.corpus import BasicDictionary
+from taskbot.trash.corpus import BasicDictionary
 
 
 class TestCorpus:

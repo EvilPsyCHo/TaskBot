@@ -5,7 +5,7 @@
 
 
 from taskbot.models.seq2seq import DynamicEncoder
-from taskbot.vocabulary import BasicVocabulary
+from taskbot.trash.vocabulary import BasicVocabulary
 
 
 encoder_vocab_size = 10000
