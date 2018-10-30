@@ -2,12 +2,7 @@
 # @Time    : 9/4/18 14:20
 # @Author  : evilpsycho
 # @Mail    : evilpsycho42@gmail.com
-<<<<<<< HEAD
 from sklearn.feature_extraction.text import CountVectorizer
-corpus = ["好呀 123", "嗯那"]
-cv = CountVectorizer(ngram_range=[1,2]).fit(corpus)
-from keras.preprocessing.text import Tokenizer
-=======
 import re
 import logging
 from collections import defaultdict
@@ -16,7 +11,7 @@ import numpy as np
 
 from taskbot.utils import SaveLoad
 from taskbot.utils.common import reverse_dict
->>>>>>> 4e8d465ef72a20bf64bb385b99ff416f5a063546
+
 
 logger = logging.getLogger("taskbot.Dictionary")
 
