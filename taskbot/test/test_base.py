@@ -4,10 +4,10 @@
 # @Mail    : evilpsycho42@gmail.com
 import os
 
-from taskbot.utils.serialization import SaveLoad
+from taskbot.base import *
 
 
-class TestSaveLoad:
+class TestBase:
 
     def test_saveload(self):
         sl = SaveLoad()
